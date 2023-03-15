@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -40,3 +41,16 @@ class StoreZone(models.Model):
     store_id = models.BigAutoField(primary_key=True, db_column='store_id')
     timezone = models.CharField(max_length=50, default='America/Chicago')
     open24x7 = models.BooleanField(default=True)
+
+
+class Report(models.Model):
+    """
+    Model to store report data
+    report_id: to store unique uuid
+    report_status: To store status of report
+        whether the report is ready to be fetched or not
+    file: Report endpoint
+    """
+    report_id = models.UUIDField(unique=True, default=uuid.uuid4)
+    status = models.CharField(max_length=10, default="running")
+    path = models.TextField(default='')
