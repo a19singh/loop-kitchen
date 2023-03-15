@@ -1,0 +1,5 @@
+*/migrations/*.py
+*/migrations/*.pyc
+*.swp*
+*__pycache__*
+*.csv
