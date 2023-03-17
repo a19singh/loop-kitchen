@@ -15,11 +15,8 @@ def convert_timezone(
     """
     Convert in desired date time format
     """
-    end_time = datetime.datetime.strptime(time_str, input_time_format)
-    dt_object = django_utils.timezone.make_aware(
-        end_time,
-        timezone=pytz.timezone(time_zone)
-    )
+    time = datetime.datetime.strptime(time_str, input_time_format)
+    dt_object = timezone_aware(time, time_zone)
     return dt_object
 
 
@@ -31,4 +28,11 @@ def change_timezone(dt_object, desired_timezone=default_timezone):
         pytz.timezone(desired_timezone)
     )
     return expected_timezone_time
+
+def timezone_aware(time, time_zone):
+    dt_object = django_utils.timezone.make_aware(
+        time,
+        timezone=pytz.timezone(time_zone)
+    )
+    return dt_object
 

@@ -8,12 +8,11 @@ from utils import convert_timezone
 
 class Command(BaseCommand):
 
-
     def handle(self, *args, **options):
 
-        # self.stdout.write(
-        #     '-------------------- Start Db Dump --------------------\n'
-        # )
+        self.stdout.write(
+            '-------------------- Start Db Dump --------------------\n'
+        )
 
         # zone_data = pandas.read_csv(
         #     'csv_data/bq-results-20230125-202210-1674678181880.csv',
@@ -81,16 +80,18 @@ class Command(BaseCommand):
             index_col=False
         )
         status_data_total, i, skip = status_data.shape[0], 0, 0
-        format_ = "%Y-%m-%d %H:%M:%S.%f %Z"
         time_zone = "UTC"
         try:
             for index in status_data.index:
+                format_ = "%Y-%m-%d %H:%M:%S.%f %Z"
                 i += 1
                 try:
-                    if not bool(datetime.strptime(
-                            status_data['timestamp_utc'][index],
-                            format_
-                    )):
+                    try:
+                        x = datetime.strptime(
+                                status_data['timestamp_utc'][index],
+                                format_
+                        )
+                    except Exception:
                         format_ = "%Y-%m-%d %H:%M:%S %Z"
                     store_obj = StoreZone.objects.get(
                         store_id=status_data['store_id'][index]

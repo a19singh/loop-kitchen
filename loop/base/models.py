@@ -1,5 +1,6 @@
 import uuid
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 
@@ -51,6 +52,11 @@ class Report(models.Model):
         whether the report is ready to be fetched or not
     file: Report endpoint
     """
-    report_id = models.UUIDField(unique=True, default=uuid.uuid4)
+    report_id = models.UUIDField(
+        unique=True,
+        default=uuid.uuid4,
+        primary_key=True
+    )
     status = models.CharField(max_length=10, default="running")
-    path = models.TextField(default='')
+    path = models.FileField(upload_to="media", blank=True)
+    cdate = models.DateTimeField(default=timezone.now)

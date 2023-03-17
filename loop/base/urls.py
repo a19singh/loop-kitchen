@@ -9,7 +9,7 @@ urlpatterns = [
         })
     ),
     path(
-        'get_report/<int:pk>',
+        'get_report/<str:pk>',
         views.ReportView.as_view({
             'get': 'retrieve'
         })
