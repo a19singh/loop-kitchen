@@ -32,6 +32,11 @@ class ReportGenerator():
     ):
         """
         Method to calculate uptime and downtime for last hour
+
+        Returns:
+        --------
+            uptime_last_hour: float (in hours)
+            downtime_last_hour: float (in hours)
         """
         last_hour_start_time = current_timestamp - \
             datetime.timedelta(hours=1)
@@ -48,6 +53,11 @@ class ReportGenerator():
     def last_day(self, qs, store_hours_qs, store_status_qs, current_timestamp):
         """
         Method to calulate uptime and downtime for last day
+        
+        Returns:
+        --------
+            uptime_24_hours: float (in hours)
+            downtime_24_hours: float (in hours)
         """
         current_weekday = current_timestamp.weekday()
         # extract store timmings for last day
@@ -155,6 +165,11 @@ class ReportGenerator():
     def last_week(self, qs, store_status_qs, store_hours_qs, current_timestamp):
         """
         Method to calulate uptime and downtime for last week
+
+        Returns:
+        --------
+            uptime_last_week: float (in hours)
+            downtime_last_week: float (in hours)
         """
         current_weekday = current_timestamp.weekday()
         # calculating date for last sunday (end of week)
@@ -205,7 +220,8 @@ class ReportGenerator():
 
     def generate_report(self, report_obj):
         """
-        Threaded method to handle report generation
+        Threaded method to handle report generation,
+        Updatation of report status and its path
         """
         schema = [
             'store_id', 'uptime_last_hour(in minutes)',
@@ -255,7 +271,7 @@ class ReportGenerator():
             each_store_stats.append(downtime_24_hours)
             each_store_stats.append(downtime_last_week)
             report_stats.append(each_store_stats)
-        file_path = f"report_{time.time()}.csv"
+        file_path = f"report_{report_obj.report_id}.csv"
         df = pd.DataFrame(report_stats, columns=schema)
         df.to_csv(f"media/{file_path}", index=False)
         report_obj.path = file_path
@@ -268,6 +284,11 @@ class ReportGenerator():
         """
         To calculate a stores active probability
         b/w a specific time frame
+
+        Returns:
+        --------
+            active_status: int 
+            inactive_status: int
         """
         status_filter_qs_24 = store_status_qs.filter(
             store_id=qs,
@@ -283,6 +304,14 @@ class ReportGenerator():
     def uptime_downtime(self, active_status, inactive_status, active_time):
         """
         Calculate uptime and downtime for a specific time period
+
+        Calculating active percentage from the known timestamps
+        then multiplying it with stores total active time
+
+        Returns:
+        --------
+            uptime: float (in hours)
+            downtime: float (in hours)
         """
         try:
             active_percent = active_status/(
@@ -298,6 +327,11 @@ class ReportGenerator():
     def helper(self, qs, store_status_qs, start_time, end_time):
         """
         Common helper function to calulate uptime and downtime
+
+        Returns:
+        --------
+            uptime: float (in hours)
+            downtime: float (in hours)
         """
         active_status, inactive_status = self.status_count(
             qs, store_status_qs, start_time, end_time
