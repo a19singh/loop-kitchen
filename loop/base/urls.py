@@ -11,7 +11,8 @@ urlpatterns = [
     path(
         'get_report/<str:pk>',
         views.ReportView.as_view({
-            'get': 'retrieve'
+            'get': 'retrieve',
+            'delete': 'destroy'
         })
     ),
     path(
