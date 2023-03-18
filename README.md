@@ -34,13 +34,17 @@ $ python manage.py loaddata
 ```
 
 - to start generating report
+
 POST request: http://127.0.0.1:8000/base/trigger_report
 
 - tp list all generated reports
+
 GET request: http://127.0.0.1:8000/base/get_report
 
 - to fetch report status and access report link
+
 GET request: http://127.0.0.1:8000/base/get_report/<report_id>
 
 - to delete a report
+
 DELETE request: http://127.0.0.1:8000/base/get_report/<report_id>
