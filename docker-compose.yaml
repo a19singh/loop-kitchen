@@ -5,7 +5,8 @@ services:
     container_name: 'code_container'
     working_dir: /code/loop
     user: root
-    build: .
+    image: asingh19/loop_kitchen_report_conatiner
+    # build: .
     command: bash -c "sh /code/loop/start.sh && tail -f /dev/null"
     # command: bash -c "tail -f /dev/null"
     ports:
