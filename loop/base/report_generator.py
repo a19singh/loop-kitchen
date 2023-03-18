@@ -18,7 +18,7 @@ class ReportGenerator():
         last_hour
         last_day
         last_week
-        generate_week
+        generate_report
         status_count
         uptime_downtime
         helper
@@ -232,53 +232,59 @@ class ReportGenerator():
         store_zone_qs = StoreZone.objects.all()
         store_status_qs = StoreStatus.objects.all()
         store_hours_qs = MenuHours.objects.all()
-        current_timestamp = store_status_qs.order_by('-timestamp')\
-            .first().timestamp
-        report_stats = []
+        try:
+            current_timestamp = store_status_qs.order_by('-timestamp')\
+                .first().timestamp
+            report_stats = []
 
-        total_stores, i = store_zone_qs.count(), 0
-        for qs in store_zone_qs:
-            i += 1
-            # changing the current timestamp
-            # from utc to stores timezone
-            each_store_stats = [str(qs.store_id)]
-            current_timestamp = change_timezone(
-                current_timestamp,
-                desired_timezone=qs.timezone
-            )
+            total_stores, i = store_zone_qs.count(), 0
+            for qs in store_zone_qs:
+                i += 1
+                # changing the current timestamp
+                # from utc to stores timezone
+                each_store_stats = [str(qs.store_id)]
+                current_timestamp = change_timezone(
+                    current_timestamp,
+                    desired_timezone=qs.timezone
+                )
 
-            # for last hour
-            uptime_last_hour, downtime_last_hour = self.last_hour(
-                qs, current_timestamp, store_status_qs
-            )
+                # for last hour
+                uptime_last_hour, downtime_last_hour = self.last_hour(
+                    qs, current_timestamp, store_status_qs
+                )
 
-            # for last day (24 hours)
-            uptime_24_hours, downtime_24_hours = self.last_day(
-                qs, store_hours_qs, store_status_qs, current_timestamp
-            )
+                # for last day (24 hours)
+                uptime_24_hours, downtime_24_hours = self.last_day(
+                    qs, store_hours_qs, store_status_qs, current_timestamp
+                )
 
-            # for last week
-            uptime_last_week, downtime_last_week = self.last_week(
-                qs, store_status_qs, store_hours_qs, current_timestamp
-            )
-            if i % 1000 == 0:
-                print(f"{i} of {total_stores} completed")
+                # for last week
+                uptime_last_week, downtime_last_week = self.last_week(
+                    qs, store_status_qs, store_hours_qs, current_timestamp
+                )
+                if i % 1000 == 0:
+                    print(f"{i} of {total_stores} completed")
 
-            each_store_stats.append(uptime_last_hour)
-            each_store_stats.append(uptime_24_hours)
-            each_store_stats.append(uptime_last_week)
-            each_store_stats.append(downtime_last_hour)
-            each_store_stats.append(downtime_24_hours)
-            each_store_stats.append(downtime_last_week)
-            report_stats.append(each_store_stats)
-        file_path = f"report_{report_obj.report_id}.csv"
-        df = pd.DataFrame(report_stats, columns=schema)
-        df.to_csv(f"media/{file_path}", index=False)
-        report_obj.path = file_path
-        report_obj.status = "complete"
-        report_obj.save()
+                each_store_stats.append(uptime_last_hour)
+                each_store_stats.append(uptime_24_hours)
+                each_store_stats.append(uptime_last_week)
+                each_store_stats.append(downtime_last_hour)
+                each_store_stats.append(downtime_24_hours)
+                each_store_stats.append(downtime_last_week)
+                report_stats.append(each_store_stats)
+            file_path = f"report_{report_obj.report_id}.csv"
+            df = pd.DataFrame(report_stats, columns=schema)
+            df.to_csv(f"media/{file_path}", index=False)
+            report_obj.path = file_path
+            report_obj.status = "complete"
+            report_obj.save()
+            print("Report Generation Successful")
 
-        print("Report Generation Successful")
+        except Exception:
+            report_obj.status = "failed"
+            report_obj.save()
+            print("Report Generation Failed")
+
 
     def status_count(self, qs, store_status_qs, start_time, end_time):
         """
