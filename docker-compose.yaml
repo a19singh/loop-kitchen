@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  report_conatiner:
+    container_name: 'code_container'
+    working_dir: /code/loop
+    user: root
+    build: .
+    command: bash -c "sh /code/loop/start.sh && tail -f /dev/null"
+    # command: bash -c "tail -f /dev/null"
+    ports:
+      - '127.0.0.1:8000:8000'
+    depends_on:
+      - mysql
+  mysql:
+    image: mysql
+    container_name: 'mysql_container'
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: 'loop_project'
+      HOST: 127.0.0.1
+    ports:
+      - '127.0.0.1:3307:3306'
+    volumes:
+      - ./sqldb:/var/lib/mysql
