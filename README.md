@@ -20,6 +20,7 @@ $ git clone <URL>
 
  ```sh
  $ cd loop-kitchen
+ $ mkdir sqldb
  ```
 
 -   provision the infrastructure
